@@ -1,4 +1,5 @@
 #include "board.hpp"
+#include <stdlibs.h>
 
 /*
  * Make a standard 8x8 othello board and initialize it to the standard setup.
@@ -160,6 +161,26 @@ int Board::countBlack() {
  */
 int Board::countWhite() {
     return taken.count() - black.count();
+}
+
+int Board::heuristic(Move *m, Side side) {
+    int X = m->getX();
+    int Y = m->getY();
+    int ours;
+    if(side == BLACK) {
+        ours = this.countBlack();
+    }
+    else {
+        ours = this.countWhite();
+    }
+    int heuristic = 2 * ours - this.count();
+    if(((x == 0) || (x == 7)) && ((y == 0) || (y == 7))) {
+        heuristic = abs(heuristic) * 3;
+    }
+    if(((x == 1) || (x == 6)) && ((y == 1) || (y == 6))) {
+        heuristic = abs(heuristic) * -3;
+    }
+    return heuristic;
 }
 
 /*
