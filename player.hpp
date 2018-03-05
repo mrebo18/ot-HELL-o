@@ -16,6 +16,10 @@ public:
 
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
+    
+    Board main_board;
+    Side my_side;
+    Side op_side;
 };
 
 #endif

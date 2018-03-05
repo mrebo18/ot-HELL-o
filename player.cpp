@@ -8,7 +8,17 @@
 Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
+    main_board = Board();
+    my_side = side;
 
+    if (my_side == WHITE)
+    {
+        op_side = BLACK;
+    }
+    else
+    {
+        op_side = WHITE;
+    }
     /*
      * TODO: Do any initialization you need to do here (setting up the board,
      * precalculating things, etc.) However, remember that you will only have
@@ -40,5 +50,30 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */
+    if (opponentsMove != nullptr)
+    {
+        //do something with their move
+        main_board.doMove(opponentsMove, op_side);
+    }
+
+    if (!main_board.hasMoves(my_side))
+    {
+        return nullptr;
+    }
+    
+    // is there a more efficient way to implement the move function?
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            Move *move = new Move(i, j);
+            if(main_board.checkMove(move, my_side))
+            {
+                main_board.doMove(move, my_side);
+                return move;
+            }
+            delete move;
+        }
+    }
     return nullptr;
+
+
 }
