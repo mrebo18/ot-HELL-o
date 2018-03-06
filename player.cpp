@@ -62,17 +62,24 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     }
     
     // is there a more efficient way to implement the move function?
+    Move *bestMove;
+    int bestH = -100000000;
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             Move *move = new Move(i, j);
-            if(main_board.checkMove(move, my_side))
-            {
-                main_board.doMove(move, my_side);
-                return move;
+            if(main_board.checkMove(move, my_side)) {
+                if(main_board.heuristic(move, my_side) > bestH) {
+                    bestMove = move;
+                }
+                else {
+                    delete move;
+                }
             }
-            delete move;
         }
     }
+    main_board.doMove(bestMove, my_side);
+    return bestMove;
+
     return nullptr;
 
 
