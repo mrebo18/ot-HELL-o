@@ -183,6 +183,52 @@ int Board::heuristic(Move *m, Side side) {
     return h;
 }
 
+Move *Board::minimax(int depth, int max, Side side) {
+    Board *copy = this->copy();
+    Move *best;
+    Move *worst;
+
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            Move *move = new Move(i, j);
+            if(copy->checkMove(move, side)) {
+                if(depth == 0) {
+                    move->setHeur(copy->heuristic(move, side));
+                    if ((worst == nullptr) || 
+                        (move->getHeur() < worst->getHeur())) {
+                        worst = move;
+                    }
+                }
+                else {
+                    copy->doMove(move, side);
+                    Move *temp = copy->minimax(depth - 1, max, side);
+                    if ((depth != max) && ((worst == nullptr) ||
+                        (temp->getHeur() < worst->getHeur())))
+                    {
+                        worst = temp;
+                    }
+                    else
+                    {
+                        if ((best == nullptr) ||
+                            (temp->getHeur() > best->getHeur()))
+                        {
+                            best = temp;
+                        }
+                    }
+                    // reset board state here; make undoMove?
+                    // also need to find some way to get rid of past values of best
+                    
+                }
+            }
+            else { delete move; }
+        }
+    }
+
+    if (depth == max) {
+        return best;
+    }
+    return worst;
+}
 
 /*
  * Sets the board state given an 8x8 char array where 'w' indicates a white
