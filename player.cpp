@@ -84,3 +84,66 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
 
 }
+
+
+std::vector<Move*> Player::possible(Board board, Side side)
+{
+    std::vector<Move*> vect;
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            Move *move = new Move(i, j);
+            if(board.checkMove(move, side)) {
+                move->setHeur(board.heuristic(move, side));
+                vect.push_back(move);
+            }
+            else {
+                delete move;
+            }
+        }
+    }
+    return vect;
+}
+
+// Move *Player::minimax(Board board, int level, int depth, int max) {
+//     std::vector<Move*> allMoves = possible(board, my_side);
+//     Move *best;
+//     Move *worst;
+
+//     for(int i = 1; i < 5; i++) {}
+//     if(depth == 0) {
+//         move->setHeur(copy->heuristic(move, side));
+//         if ((worst == nullptr) || 
+//             (move->getHeur() < worst->getHeur())) {
+//             worst = move;
+//         }
+//     }
+//     else {
+//         copy->doMove(move, side);
+//         Move *temp = copy->minimax(depth - 1, max, side);
+//         if ((depth != max) && ((worst == nullptr) ||
+//             (temp->getHeur() < worst->getHeur())))
+//         {
+//             worst = temp;
+//         }
+//         else
+//         {
+//             if ((best == nullptr) ||
+//                 (temp->getHeur() > best->getHeur()))
+//             {
+//                 best = temp;
+//             }
+//         }
+//         // reset board state here; make undoMove?
+//         // also need to find some way to get rid of past values of best
+        
+//     }
+            
+//     else { delete move; }
+        
+    
+
+//     if (depth == max) {
+//         return best;
+//     }
+//     return worst;
+// }

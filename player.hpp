@@ -2,6 +2,7 @@
 #define __PLAYER_H__
 
 #include <iostream>
+#include <vector>
 #include "common.hpp"
 #include "board.hpp"
 using namespace std;
@@ -13,6 +14,8 @@ public:
     ~Player();
 
     Move *doMove(Move *opponentsMove, int msLeft);
+    std::vector<Move*> possible(Board board, Side side);
+    //Move *minimax(Board board, int level, int depth, int max);
 
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
