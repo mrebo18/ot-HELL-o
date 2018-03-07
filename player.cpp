@@ -104,10 +104,10 @@ std::vector<Move*> Player::possible(Board board, Side side)
     return vect;
 }
 
-// Move *Player::minimax(Board board, int level, int depth, int max) {
+// Move *Player::minimax(Board board, int level, int depth, bool top) {
 //     std::vector<Move*> allMoves = possible(board, my_side);
-//     Move *best;
-//     Move *worst;
+//     Move *max;
+//     Move *min;
 
 //     for(int i = 1; i < 5; i++) {}
 //     if(depth == 0) {
