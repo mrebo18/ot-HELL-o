@@ -93,7 +93,6 @@ std::vector<Move*> Player::possible(Board board, Side side)
         for (int j = 0; j < 8; j++) {
             Move *move = new Move(i, j);
             if(board.checkMove(move, side)) {
-                move->setHeur(board.heuristic(move, side));
                 vect.push_back(move);
             }
             else {
@@ -103,6 +102,7 @@ std::vector<Move*> Player::possible(Board board, Side side)
     }
     return vect;
 }
+
 
 // Move *Player::minimax(Board board, int level, int depth, bool top) {
 //     std::vector<Move*> allMoves = possible(board, my_side);
