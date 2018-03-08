@@ -1,7 +1,7 @@
 #include "board.hpp"
-#include <stdio.h>
-#include <stdlib.h>
-
+#include <cstring>
+#include <cstdio>
+#include <iostream>
 /*
  * Make a standard 8x8 othello board and initialize it to the standard setup.
  */
@@ -12,6 +12,7 @@ Board::Board() {
     taken.set(4 + 8 * 4);
     black.set(4 + 8 * 3);
     black.set(3 + 8 * 4);
+
 }
 
 /*
@@ -164,6 +165,33 @@ int Board::countWhite() {
     return taken.count() - black.count();
 }
 
+
+int Board::heuristic(Move *m, Side side) {
+    int he = 0;
+    Board moved = *this->copy();
+    moved.doMove(m, side);
+    if(side == BLACK) {
+        he = moved.countBlack() - moved.countWhite();
+    }
+    else {
+        he = moved.countWhite() - moved.countBlack();
+    }
+    he *= 5;
+    for(int x = 0; x < 8; x++) {
+        for(int y = 0; y < 8; y++) {
+            if(moved.get(side, x, y)) {
+                he += h[x][y];
+            }
+            else {
+                he -= h[x][y];
+            }
+        }
+    }
+    return he;
+
+}
+
+
 /*
 int Board::heuristic(Move *m, Side side) {
     int X = m->getX();
@@ -176,66 +204,37 @@ int Board::heuristic(Move *m, Side side) {
     else {
         h = moved.countWhite() - moved.countBlack();
     }
+    
     if(((X == 0) || (X == 7)) && ((Y == 0) || (Y == 7))) {
-        h = h + 40;
+        h = h + 80;
     }
     else if(((X == 1) || (X == 6)) && ((Y == 1) || (Y == 6))) {
-        h = h - 40;
+        h = h - 80;
     }
     else if(((X == 7) || (X == 6)) && ((Y == 7) || (Y == 6))) {
-        h = h - 25;
+        h = h - 60;
     }
     else if(((X == 1) || (X == 0)) && ((Y == 1) || (Y == 0))) {
-        h = h - 25;
+        h = h - 60;
     }
     else if(((X == 6) || (X == 0)) && ((Y == 0) || (Y == 6))) {
-        h = h - 25;
-    }
+        h = h - 60;
+    }  
     else if(((X == 7) || (X == 1)) && ((Y == 7) || (Y == 1))) {
-        h = h - 25;
+        h = h - 60;
     }
     else if((X == 1) || (X == 6) || (Y == 1) || (Y == 6)) {
-        h = h - 20;
+        h = h - 40;
     }
     else if((X == 0) || (X == 7) || (Y == 0) || (Y == 7)) {
-        h = h + 0;
+        h = h + 40;
     }
-    else {
+    if(moved.countBlack() + moved.countWhite() > 10) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Move move(i, j);
                 if (moved.checkMove(&move, side)) {
-                    h += 1;
-                }
-            }
-        }
-    }
-    for(int x = 0; x < 8; x++) {
-        for(int y = 0; y < 8; x++) {
-            if(moved.get(side, x, y)) {
-                if(((x == 0) || (x == 7)) && ((y == 0) || (y == 7))) {
-                    h = h + 10;
-                }
-                else if(((X == 1) || (X == 6)) && ((y == 1) || (y == 6))) {
-                    h = h - 5;
-                }
-                else if(((x == 7) || (x == 6)) && ((y == 7) || (y == 6))) {
-                    h = h - 5;
-                }
-                else if(((x == 1) || (x == 0)) && ((y == 1) || (y == 0))) {
-                    h = h - 5;
-                }
-                else if(((x == 6) || (x == 0)) && ((y == 0) || (y == 6))) {
-                    h = h - 5;
-                }
-                else if(((x == 7) || (x == 1)) && ((y == 7) || (y == 1))) {
-                    h = h - 5;
-                }
-                else if((x == 1) || (x == 6) || (y == 1) || (y == 6)) {
-                    h = h - 3;
-                }
-                else if((x == 0) || (x == 7) || (y == 0) || (y == 7)) {
-                    h = h + 5;
+                    h += 2;
                 }
             }
         }
@@ -243,54 +242,6 @@ int Board::heuristic(Move *m, Side side) {
     return h;
 }
 */
-
-
-int Board::heuristic(Move *m, Side side) {
-    int X = m->getX();
-    int Y = m->getY();
-    int h;
-    Board moved = *this->copy();
-    if(side == BLACK) {
-        h = moved.countBlack() - moved.countWhite();
-    }
-    else {
-        h = moved.countWhite() - moved.countBlack();
-    }
-    if(((X == 0) || (X == 7)) && ((Y == 0) || (Y == 7))) {
-        h = h + 100;
-    }
-    else if(((X == 1) || (X == 6)) && ((Y == 1) || (Y == 6))) {
-        h = h - 100;
-    }
-    else if(((X == 7) || (X == 6)) && ((Y == 7) || (Y == 6))) {
-        h = h - 60;
-    }
-    else if(((X == 1) || (X == 0)) && ((Y == 1) || (Y == 0))) {
-        h = h - 60;
-    }
-    else if(((X == 6) || (X == 0)) && ((Y == 0) || (Y == 6))) {
-        h = h - 60;
-    }
-    else if(((X == 7) || (X == 1)) && ((Y == 7) || (Y == 1))) {
-        h = h - 60;
-    }
-//    else if((X == 1) || (X == 6) || (Y == 1) || (Y == 6)) {
-//        h = h - 20;
-//    }
-    else if((X == 0) || (X == 7) || (Y == 0) || (Y == 7)) {
-        h = h + 40;
-    }
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            Move move(i, j);
-            if (moved.checkMove(&move, side)) {
-                h += 1;
-            }
-        }
-    }
-    return h;
-}
-
 
 /*
  * Sets the board state given an 8x8 char array where 'w' indicates a white
