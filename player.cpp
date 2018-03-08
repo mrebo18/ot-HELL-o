@@ -63,46 +63,45 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     
     // is there a more efficient way to implement the move function?
     Move *bestMove = nullptr;
-    int bestH = -100000000;
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            Move *move = new Move(i, j);
-            if(main_board->checkMove(move, my_side)) {
-                int temp = main_board->heuristic(move, my_side);
-                std::cerr << temp << std::endl;
-                std::cerr << i << " ," << j << std::endl;
-                if( temp > bestH) {
-                    if(bestMove) {
-                        delete bestMove;
+    if (testingMinimax == true) {
+        bestMove = get_mini(main_board, 2);
+    }
+    else {
+        int bestH = -1000000;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Move *move = new Move(i, j);
+                if(main_board->checkMove(move, my_side)) {
+                    int temp = main_board->heuristic(move, my_side);
+                    if( temp > bestH) {
+                        if(bestMove) {
+                            delete bestMove;
+                        }
+                        bestMove = move;
+                        bestH = temp;
                     }
-                    bestMove = move;
-                    bestH = temp;
-                }
-                else {
-                    delete move;
+                    else {
+                        delete move;
+                    }
                 }
             }
         }
+        //bestMove = get_mini(main_board, 1);
     }
-
-    std::cerr << " CHOSE: " << bestMove->getX() << " " << bestMove->getY() << "  " << bestH << std::endl;
-
     main_board->doMove(bestMove, my_side);
     return bestMove;
-
-    return nullptr;
-
-
 }
 
-
-std::vector<Move*> Player::possible(Board board, Side side)
+/*
+ * Creates a vector of the possible moves given a specific board and side.
+ */
+std::vector<Move*> Player::possible(Board *board, Side side)
 {
     std::vector<Move*> vect;
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             Move *move = new Move(i, j);
-            if(board.checkMove(move, side)) {
+            if(board->checkMove(move, side)) {
                 vect.push_back(move);
             }
             else {
@@ -114,46 +113,79 @@ std::vector<Move*> Player::possible(Board board, Side side)
 }
 
 
-// Move *Player::minimax(Board board, int level, int depth, bool top) {
-//     std::vector<Move*> allMoves = possible(board, my_side);
-//     Move *max;
-//     Move *min;
+/*
+ * Returns the best possible move after searching a certain depth.
+ */
+Move *Player::get_mini(Board *board, int end) {
+    // get possible moves
+    std::vector<Move*> moves = possible(board, my_side);
+    int best_h = -10000; //best heuristic
+    int temp_h;
+    Move *best;
+    for (uint i = 0; i < moves.size(); i++) {
+        Board *copied = board->copy();
+        temp_h = minimax(copied, 1, end, moves[i], my_side);
+        if (temp_h > best_h) {
+            best_h = temp_h;
+            best = moves[i];
+        }
+    }
+    for (uint i = 0; i < moves.size(); i++) {
+        if (moves[i] != best) {
+            delete moves[i];
+        }
+    }
+    return best;
+}
 
-//     for(int i = 1; i < 5; i++) {}
-//     if(depth == 0) {
-//         move->setHeur(copy->heuristic(move, side));
-//         if ((worst == nullptr) || 
-//             (move->getHeur() < worst->getHeur())) {
-//             worst = move;
-//         }
-//     }
-//     else {
-//         copy->doMove(move, side);
-//         Move *temp = copy->minimax(depth - 1, max, side);
-//         if ((depth != max) && ((worst == nullptr) ||
-//             (temp->getHeur() < worst->getHeur())))
-//         {
-//             worst = temp;
-//         }
-//         else
-//         {
-//             if ((best == nullptr) ||
-//                 (temp->getHeur() > best->getHeur()))
-//             {
-//                 best = temp;
-//             }
-//         }
-//         // reset board state here; make undoMove?
-//         // also need to find some way to get rid of past values of best
-        
-//     }
-            
-//     else { delete move; }
-        
-    
+/*
+ * Returns through recursion the minimum possible score that would result from
+ * a move after a given depth.
+ */
+int Player::minimax(Board *board, int depth, int end, Move *move, Side side) {
+    std::vector<Move*> moves = possible(board, side);
+    int worst_h = 10000; //if considering opponent's move, want to record worst
+    //int best_h = -10000; //if considering our move, want to record best
+    int move_h;
+    Move *worst_move;
 
-//     if (depth == max) {
-//         return best;
-//     }
-//     return worst;
-// }
+    for (uint i = 0; i < moves.size(); i++) {
+        if (depth == end) {
+            move_h = board->heuristic(moves[i], my_side);
+            if(move_h < worst_h) {
+                worst_h = move_h;
+            }
+        }
+        // opponent's turn, try finding & implementing the move that's worst for
+        //     me
+        else if (depth % 2 == 1) {
+            // move_h = board->heuristic(moves[i], my_side);
+            // if (move_h < worst_h) {
+            //     worst_h = move_h;
+            //     worst_move = moves[i];
+            // }
+            Board *copied = board->copy();
+            copied->doMove(moves[i], side);
+            int temp = minimax(copied, depth + 1, end, moves[i], my_side);
+            if (temp < worst_h) {
+                worst_h = temp;
+            }
+        }
+        // our turn, but not at the lowest level
+        else {
+            Board *copied = board->copy();
+            copied->doMove(moves[i], side);
+            int temp = minimax(copied, depth + 1, end, moves[i], op_side);
+            if (temp < worst_h) {
+                worst_h = temp;
+            }
+        }
+    }
+
+    // if ((depth % 2 == 1) && (depth != end)) {
+    //     Board *copied = board->copy();
+    //     copied->doMove(worst_move, side);
+    //     return minimax(copied, depth + 1, end, worst_move, my_side);
+    // }
+    return worst_h;
+}

@@ -14,8 +14,9 @@ public:
     ~Player();
 
     Move *doMove(Move *opponentsMove, int msLeft);
-    std::vector<Move*> possible(Board board, Side side);
-    //Move *minimax(Board board, int level, int depth, int max);
+    std::vector<Move*> possible(Board *board, Side side);
+    Move *get_mini(Board *board, int end);
+    int minimax(Board *board, int depth, int end, Move *move, Side side);
 
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
