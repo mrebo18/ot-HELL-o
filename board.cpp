@@ -1,7 +1,7 @@
 #include "board.hpp"
-#include <stdio.h>
-#include <stdlib.h>
-
+#include <cstring>
+#include <cstdio>
+#include <iostream>
 /*
  * Make a standard 8x8 othello board and initialize it to the standard setup.
  */
@@ -12,6 +12,7 @@ Board::Board() {
     taken.set(4 + 8 * 4);
     black.set(4 + 8 * 3);
     black.set(3 + 8 * 4);
+
 }
 
 /*
@@ -166,48 +167,28 @@ int Board::countWhite() {
 
 
 int Board::heuristic(Move *m, Side side) {
-    int X = m->getX();
-    int Y = m->getY();
-    int h;
+    int he = 0;
     Board moved = *this->copy();
+    moved.doMove(m, side);
     if(side == BLACK) {
-        h = moved.countBlack() - moved.countWhite();
+        he = moved.countBlack() - moved.countWhite();
     }
     else {
-        h = moved.countWhite() - moved.countBlack();
+        he = moved.countWhite() - moved.countBlack();
     }
+    he *= 5;
     for(int x = 0; x < 8; x++) {
         for(int y = 0; y < 8; y++) {
             if(moved.get(side, x, y)) {
-                if(((x == 0) || (x == 7)) && ((y == 0) || (y == 7))) {
-                    h = h + 20;
-                }
-                else if((x == 0) || (x == 7) || (y == 0) || (y == 7)) {
-                    h = h + 5;
-                }
+                he += h[x][y];
+            }
+            else {
+                he -= h[x][y];
             }
         }
     }
-    if(((X == 1) || (X == 6)) && ((Y == 1) || (Y == 6))) {
-        h = h - 50;
-    }
-    else if(((X == 7) || (X == 6)) && ((Y == 7) || (Y == 6))) {
-        h = h - 30;
-    }
-    else if(((X == 1) || (X == 0)) && ((Y == 1) || (Y == 0))) {
-        h = h - 30;
-    }
-    else if(((X == 6) || (X == 0)) && ((Y == 0) || (Y == 6))) {
-        h = h - 30;
-    }
-    else if(((X == 7) || (X == 1)) && ((Y == 7) || (Y == 1))) {
-        h = h - 30;
-    }
-    else if((X == 1) || (X == 6) || (Y == 1) || (Y == 6)) {
-        h = h - 20;
-    }
-    return h;
-    
+    return he;
+
 }
 
 
