@@ -61,32 +61,12 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
         return nullptr;
     }
     
-    // is there a more efficient way to implement the move function?
     Move *bestMove = nullptr;
-    if (testingMinimax == true) {
+    if (testingMinimax == true) { //specific depth search to pass minimax
         bestMove = get_mini(main_board, 2);
     }
     else {
-        int bestH = -1000000;
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                Move *move = new Move(i, j);
-                if(main_board->checkMove(move, my_side)) {
-                    int temp = main_board->heuristic(move, my_side);
-                    if( temp > bestH) {
-                        if(bestMove) {
-                            delete bestMove;
-                        }
-                        bestMove = move;
-                        bestH = temp;
-                    }
-                    else {
-                        delete move;
-                    }
-                }
-            }
-        }
-        //bestMove = get_mini(main_board, 1);
+        bestMove = get_mini(main_board, 0);
     }
     main_board->doMove(bestMove, my_side);
     return bestMove;
@@ -122,12 +102,24 @@ Move *Player::get_mini(Board *board, int end) {
     int best_h = -10000; //best heuristic
     int temp_h;
     Move *best;
-    for (uint i = 0; i < moves.size(); i++) {
-        Board *copied = board->copy();
-        temp_h = minimax(copied, 1, end, moves[i], my_side);
-        if (temp_h > best_h) {
-            best_h = temp_h;
-            best = moves[i];
+
+    if (end == 0) {
+        for (uint i = 0; i < moves.size(); i++) {
+            temp_h = board->heuristic(moves[i], my_side);
+            if (temp_h > best_h) {
+                best_h = temp_h;
+                best = moves[i];
+            }
+        }
+    }
+    else {
+        for (uint i = 0; i < moves.size(); i++) {
+            Board *copied = board->copy();
+            temp_h = minimax(copied, 1, end, moves[i], my_side);
+            if (temp_h > best_h) {
+                best_h = temp_h;
+                best = moves[i];
+            }
         }
     }
     for (uint i = 0; i < moves.size(); i++) {
@@ -147,18 +139,20 @@ int Player::minimax(Board *board, int depth, int end, Move *move, Side side) {
     int worst_h = 10000; //if considering opponent's move, want to record worst
     //int best_h = -10000; //if considering our move, want to record best
     int move_h;
-    Move *worst_move;
-
-    for (uint i = 0; i < moves.size(); i++) {
-        if (depth == end) {
+    //Move *worst_move;
+    
+    if (depth == end) {
+        for (uint i = 0; i < moves.size(); i++) {
             move_h = board->heuristic(moves[i], my_side);
             if(move_h < worst_h) {
                 worst_h = move_h;
             }
         }
-        // opponent's turn, try finding & implementing the move that's worst for
-        //     me
-        else if (depth % 2 == 1) {
+    }
+    // opponent's turn, try finding & implementing the move that's worst for
+    //     me
+    else if (depth % 2 == 1) {
+        for (uint i = 0; i < moves.size(); i++) {
             // move_h = board->heuristic(moves[i], my_side);
             // if (move_h < worst_h) {
             //     worst_h = move_h;
@@ -171,8 +165,10 @@ int Player::minimax(Board *board, int depth, int end, Move *move, Side side) {
                 worst_h = temp;
             }
         }
-        // our turn, but not at the lowest level
-        else {
+    }
+    // our turn, but not at the lowest level
+    else {
+        for (uint i = 0; i < moves.size(); i++) {
             Board *copied = board->copy();
             copied->doMove(moves[i], side);
             int temp = minimax(copied, depth + 1, end, moves[i], op_side);
