@@ -187,61 +187,32 @@ int Board::heuristic(Move *m, Side side) {
             }
         }
     }
+    if (side == WHITE) {
+        he -= moved.mobility(BLACK);
+    }
+    else {
+        he -= moved.mobility(WHITE);
+    }
     return he;
 
 }
 
-
-/*
-int Board::heuristic(Move *m, Side side) {
-    int X = m->getX();
-    int Y = m->getY();
-    int h;
-    Board moved = *this->copy();
-    if(side == BLACK) {
-        h = moved.countBlack() - moved.countWhite();
-    }
-    else {
-        h = moved.countWhite() - moved.countBlack();
-    }
-    
-    if(((X == 0) || (X == 7)) && ((Y == 0) || (Y == 7))) {
-        h = h + 80;
-    }
-    else if(((X == 1) || (X == 6)) && ((Y == 1) || (Y == 6))) {
-        h = h - 80;
-    }
-    else if(((X == 7) || (X == 6)) && ((Y == 7) || (Y == 6))) {
-        h = h - 60;
-    }
-    else if(((X == 1) || (X == 0)) && ((Y == 1) || (Y == 0))) {
-        h = h - 60;
-    }
-    else if(((X == 6) || (X == 0)) && ((Y == 0) || (Y == 6))) {
-        h = h - 60;
-    }  
-    else if(((X == 7) || (X == 1)) && ((Y == 7) || (Y == 1))) {
-        h = h - 60;
-    }
-    else if((X == 1) || (X == 6) || (Y == 1) || (Y == 6)) {
-        h = h - 40;
-    }
-    else if((X == 0) || (X == 7) || (Y == 0) || (Y == 7)) {
-        h = h + 40;
-    }
-    if(moved.countBlack() + moved.countWhite() > 10) {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                Move move(i, j);
-                if (moved.checkMove(&move, side)) {
-                    h += 2;
-                }
+int Board::mobility(Side side) {
+    int count = 0;
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            Move *move = new Move(i, j);
+            if(this->checkMove(move, side)) {
+                count += 2;
             }
+            delete move;
         }
     }
-    return h;
+    if (count == 0) {
+        count = -100;
+    }
+    return count;
 }
-*/
 
 /*
  * Sets the board state given an 8x8 char array where 'w' indicates a white

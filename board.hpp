@@ -37,7 +37,7 @@ public:
     int countBlack();
     int countWhite();
     int heuristic(Move *m, Side side);
-    Move *minimax(int depth, int max, Side side);
+    int mobility(Side side);
 
     void setBoard(char data[]);
 };
