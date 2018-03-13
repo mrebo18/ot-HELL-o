@@ -136,10 +136,8 @@ Move *Player::get_mini(Board *board, int end) {
  */
 int Player::minimax(Board *board, int depth, int end, Move *move, Side side) {
     std::vector<Move*> moves = possible(board, side);
-    int worst_h = 10000; //if considering opponent's move, want to record worst
-    //int best_h = -10000; //if considering our move, want to record best
+    int worst_h = 10000;
     int move_h;
-    //Move *worst_move;
     
     if (depth == end) {
         for (uint i = 0; i < moves.size(); i++) {
@@ -149,15 +147,9 @@ int Player::minimax(Board *board, int depth, int end, Move *move, Side side) {
             }
         }
     }
-    // opponent's turn, try finding & implementing the move that's worst for
-    //     me
+    // opponent's turn, finding & implementing the move that's worst for me
     else if (depth % 2 == 1) {
         for (uint i = 0; i < moves.size(); i++) {
-            // move_h = board->heuristic(moves[i], my_side);
-            // if (move_h < worst_h) {
-            //     worst_h = move_h;
-            //     worst_move = moves[i];
-            // }
             Board *copied = board->copy();
             copied->doMove(moves[i], side);
             int temp = minimax(copied, depth + 1, end, moves[i], my_side);
@@ -177,11 +169,5 @@ int Player::minimax(Board *board, int depth, int end, Move *move, Side side) {
             }
         }
     }
-
-    // if ((depth % 2 == 1) && (depth != end)) {
-    //     Board *copied = board->copy();
-    //     copied->doMove(worst_move, side);
-    //     return minimax(copied, depth + 1, end, worst_move, my_side);
-    // }
     return worst_h;
 }
