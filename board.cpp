@@ -165,7 +165,12 @@ int Board::countWhite() {
     return taken.count() - black.count();
 }
 
-
+/*
+ * Calculates a heuristic by iterating through the board and a 2D
+ * array with weight values and adding weight values of our pieces to
+ * the simple heuristic of the difference in the number of pieces for
+ * each side of the board.
+ */
 int Board::heuristic(Move *m, Side side) {
     int he = 0;
     Board moved = *this->copy();
@@ -197,6 +202,10 @@ int Board::heuristic(Move *m, Side side) {
 
 }
 
+/*
+ * Takes mobility into account by ocunding the number of possible movves
+ * for the side that is passed in.
+ */
 int Board::mobility(Side side) {
     int count = 0;
     for (int i = 0; i < 8; i++) {
