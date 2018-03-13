@@ -18,7 +18,7 @@ private:
                     {5, 1,  1,  1,  1,  1, 1,  5},
                     {5, 1,  1,  1,  1,  1, 1,  5},
                     {-20,-30,  1,  1,  1,  1,-30, -20},
-                    {30, -7,  5,  5,  5,  5, -20, 30} };
+                    {30, -20,  5,  5,  5,  5, -20, 30} };
     bool occupied(int x, int y);
     bool get(Side side, int x, int y);
     void set(Side side, int x, int y);
